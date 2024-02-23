@@ -1,0 +1,34 @@
+name: "Build Python"
+description: "Builds the source and binary distribution of a Python package."
+author: "Frequenz Energy-as-a-Service GmbH"
+
+# Refer to the following link(s) for more information on inputs:
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#inputs
+inputs:
+  python_version:
+    description: >
+      The Python version to use. This is passed to the `actions/setup-python`.
+    required: true
+  outdir:
+    description: >
+      The directory where the built packages will be placed.
+    required: false
+    default: "dist"
+
+
+# Refer to the following link(s) for more information on the composite run steps:
+# https://docs.github.com/en/actions/creating-actions/metadata-syntax-for-github-actions#runs
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: frequenz-floss/gh-action-setup-python-with-deps@e4d0b2ef8f5a1612d7827f3abaef17c931d2b946  # v1.0.2
+      with:
+        python-version: ${{ inputs.python_version }}
+        dependencies: build
+
+    - name: Build the source and binary distribution
+      shell: bash
+      env:
+        OUTDIR: ${{ inputs.outdir }}
+      run: python -I -m build --outdir "$OUTDIR"
